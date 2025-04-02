@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSV Media Library Explorer</title>
+    <link rel="stylesheet" href="src/css/styles.css">
+    <link rel="icon" href="/favicon.ico" />
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+    <button id="themeToggle" class="absolute top-4 right-4 p-2">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-8">
+                    <pre class="text-center font-extrabold">
+ __  __   ___          __.....__                      _________   _...._      
+|  |/  `.'   `.    .-''         '.                    \        |.'      '-.   
+|   .-.  .-.   '  /     .-''"'-.  `.                   \        .'```'.    '. 
+|  |  |  |  |  | /     /________\   \ ____     _____    \      |       \     \
+|  |  |  |  |  | |                  |`.   \  .'    /     |     |        |    |
+|  |  |  |  |  | \    .-------------'  `.  `'    .'      |      \      /    . 
+|  |  |  |  |  |  \    '-.____...---.    '.    .'        |     |\`'-.-'   .'  
+|__|  |__|  |__|   `.             .'     .'     `.       |     | '-....-'`    
+                     `''-...... -'     .'  .'`.   `.    .'     '.             
+                                     .'   /    `.   `.'-----------'           
+                    '----'       '----'        
+
+                    </pre>
+                
+                <p class="text-gray-600">Upload your semicolon-separated CSV file to explore your media collection</p>
+            </div>
+
+            <div class="flex justify-end mb-3">
+                <button id="hideButton" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition flex items-center">
+                    <i class="fas fa-eye mr-2"></i> <!-- Eye icon -->
+                    <span>Hide</span>
+                </button>
+            </div>
+            
+
+            <div class="bg-white rounded-xl shadow-md overflow-hidden p-6 mb-8"  id="csvUploadDiv">
+                <div class="flex flex-col items-center">
+                    <label for="csvFile"
+                        class="file-input-label cursor-pointer w-full max-w-md border-2 border-dashed border-gray-300 rounded-lg p-8 text-center flex flex-col items-center justify-center hover:border-indigo-500">
+                        <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center mb-4">
+                            <i class="fas fa-file-csv text-indigo-600 text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-700 mb-2">Drag & drop your CSV file here</h3>
+                        <p class="text-sm text-gray-500 mb-4">or click to browse files</p>
+                        <div
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-medium hover:bg-indigo-700 transition">
+                            Select File
+                        </div>
+                        <input type="file" id="csvFile" accept=".csv" class="hidden">
+                    </label>
+
+                    <div class="mt-4 text-sm text-gray-500">
+                        <p>Supported format: .csv (Semicolon Separated Values)</p>
+                        <p class="mt-1">Expected format: year;title;genre1,genre2;disk location;size (GB);quality</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="fileInfo" class="hidden bg-white rounded-xl shadow-md overflow-hidden p-6 mb-6">
+                <div class="flex justify-between items-center mb-4">
+                    <div>
+                        <h3 class="text-lg font-medium text-gray-900">File Information</h3>
+                        <p class="text-sm text-gray-500" id="fileName"></p>
+                    </div>
+                    <button id="clearFile" class="text-red-500 hover:text-red-700 transition">
+                        <i class="fas fa-times mr-1"></i> Clear
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <p class="text-sm text-gray-500">File Size</p>
+                        <p class="font-medium text-lg" id="fileSize"></p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <p class="text-sm text-gray-500">Total Items</p>
+                        <p class="font-medium text-lg" id="itemCount"></p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                        <p class="text-sm text-gray-500">Total Size</p>
+                        <p class="font-medium text-lg" id="totalSize"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="appContent" class="hidden">
+                <div class="flex border-b border-gray-200 mb-6">
+                    <button class="tab-button active py-3 px-6 text-gray-700" data-tab="explore">
+                        <i class="fas fa-search mr-2"></i> Explore
+                    </button>
+                    <button class="tab-button py-3 px-6 text-gray-700" data-tab="statistics">
+                        <i class="fas fa-chart-pie mr-2"></i> Statistics
+                    </button>
+                </div>
+
+                <div id="exploreTab" class="tab-content active">
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden mb-6">
+                        <div class="p-6">
+                            <h3 class="text-lg font-medium text-gray-900 mb-4">Search and Filter</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                                    <input type="text" id="searchTitle" placeholder="Search by title"
+                                        class="saf w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
+                                    <select id="filterYear"
+                                        class="saf w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                                        <option value="">All Years</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Genre</label>
+                                    <select id="filterGenre"
+                                        class="saf w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                                        <option value="">All Genres</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Disk Location</label>
+                                    <select id="filterLocation"
+                                        class="saf w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                                        <option value="">All Locations</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Quality</label>
+                                    <select id="filterQuality"
+                                        class="saf w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 transition">
+                                        <option value="">All Qualities</option>
+                                        <option value="HD">HD</option>
+                                        <option value="4K">4K</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-end">
+                                    <button id="resetFilters"
+                                        class="w-full px-3 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition flex items-center justify-center">
+                                        <i class="fas fa-filter-circle-xmark mr-2"></i> Reset Filters
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+                        <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                            <h3 class="text-lg font-medium text-gray-900">Media Library</h3>
+                            <div class="flex items-center">
+                                <p class="text-sm text-gray-500 mr-4" id="resultCount"></p>
+                                <span id="loadingSpinner" class="hidden text-indigo-500">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <div class="preview-container">
+                                <div class="overflow-x-auto">
+                                    <table class="preview-table min-w-full divide-y divide-gray-200" id="mediaTable">
+                                        <thead class="bg-gray-50">
+                                            <tr>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0">
+                                                    Year</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0">
+                                                    Title</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0">
+                                                    Genres</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0">
+                                                    Location</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0">
+                                                    Size</th>
+                                                <th
+                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sticky top-0">
+                                                    Quality</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="bg-white divide-y divide-gray-200" id="mediaTableBody"></tbody>
+                                    </table>
+                                    <div id="emptyTableMessage" class="py-8 text-center text-gray-500 hidden">
+                                        <i class="fas fa-inbox text-4xl mb-2 opacity-50"></i>
+                                        <p>No media items found matching your filters</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="statisticsTab" class="tab-content">
+                    <div class="stats-grid mb-6">
+                        <div class="stat-card bg-white rounded-xl shadow-md p-5 flex flex-col">
+                            <div class="flex items-center mb-4">
+                                <div class="p-3 rounded-full bg-green-100 text-green-600 mr-4">
+                                    <i class="fas fa-film text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Total Media Items</p>
+                                    <p class="text-2xl font-bold" id="statsTotalItems">0</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-auto">All media items in your library</p>
+                        </div>
+                        <div class="stat-card bg-white rounded-xl shadow-md p-5 flex flex-col">
+                            <div class="flex items-center mb-4">
+                                <div class="p-3 rounded-full bg-blue-100 text-blue-600 mr-4">
+                                    <i class="fas fa-hdd text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Total Storage Used</p>
+                                    <p class="text-2xl font-bold" id="statsTotalSize">0 GB</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-auto">Combined size of all media</p>
+                        </div>
+                        <div class="stat-card bg-white rounded-xl shadow-md p-5 flex flex-col">
+                            <div class="flex items-center mb-4">
+                                <div class="p-3 rounded-full bg-indigo-100 text-indigo-600 mr-4">
+                                    <i class="fas fa-layer-group text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Unique Genres</p>
+                                    <p class="text-2xl font-bold" id="statsUniqueGenres">0</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-auto">Different genres represented</p>
+                        </div>
+                        <div class="stat-card bg-white rounded-xl shadow-md p-5 flex flex-col">
+                            <div class="flex items-center mb-4">
+                                <div class="p-3 rounded-full bg-purple-100 text-purple-600 mr-4">
+                                    <i class="fas fa-calendar-alt text-xl"></i>
+                                </div>
+                                <div>
+                                    <p class="text-sm text-gray-500">Earliest Year</p>
+                                    <p class="text-2xl font-bold" id="statsEarliestYear">0</p>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-400 mt-auto">Oldest item in your collection</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold text-gray-800">Media by Quality</h3>
+                                <div class="inline-flex rounded-md shadow-sm">
+                                    <button type="button"
+                                        class="chart-toggle active px-3 py-1 text-sm font-medium rounded-l-md bg-indigo-600 text-white"
+                                        data-chart="quality" data-type="count">
+                                        Count
+                                    </button>
+                                    <button type="button"
+                                        class="chart-toggle px-3 py-1 text-sm font-medium rounded-r-md bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                        data-chart="quality" data-type="size">
+                                        Size
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="relative h-64">
+                                <canvas id="qualityChart" class="w-full h-full"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-semibold text-gray-800">Media by Year</h3>
+                                <div class="inline-flex rounded-md shadow-sm">
+                                    <button type="button"
+                                        class="chart-toggle active px-3 py-1 text-sm font-medium rounded-l-md bg-indigo-600 text-white"
+                                        data-chart="year" data-type="count">
+                                        Count
+                                    </button>
+                                    <button type="button"
+                                        class="chart-toggle px-3 py-1 text-sm font-medium rounded-r-md bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                        data-chart="year" data-type="size">
+                                        Size
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="relative h-64">
+                                <canvas id="yearChart" class="w-full h-full"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Top Genres</h3>
+                        <div class="relative h-64">
+                            <canvas id="genreChart" class="w-full h-full"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Storage Space by Disk Location</h3>
+                            <div class="relative h-64">
+                                <canvas id="locationChart" class="w-full h-full"></canvas>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-xl shadow-lg p-6">
+                            <h3 class="text-lg font-semibold text-gray-800 mb-4">Storage Space by Quality</h3>
+                            <div class="relative h-64">
+                                <canvas id="storageQualityChart" class="w-full h-full"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-lg p-6">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Media Trend (Items Added per Year)</h3>
+                        <div class="relative h-64">
+                            <canvas id="trendChart" class="w-full h-full"></canvas>
+                        </div>
+                    </div>
+
+
+                    <div id="emptyState" class="text-center py-16">
+                        <div class="mx-auto w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center mb-6">
+                            <i class="fas fa-file-import text-indigo-600 text-3xl"></i>
+                        </div>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No CSV file loaded</h3>
+                        <p class="text-gray-500 max-w-md mx-auto">Upload a semicolon-separated CSV file to explore your
+                            media library.</p>
+                    </div>
+                </div>
+            </div>
+
+            <br>
+            <div class="flex justify-center items-center flex-col">
+                <p class="text-center">
+                    View this project on <a href="https://github.com/hdg-zero/mexp"><i
+                            class="fab fa-github mr-1"></i>GitHub</a>
+                    - Last updated in 2025</span>
+                </p>
+            </div>
+
+            <script type="module" src="src/js/charts.js"></script>
+            <script type="module" src="src/js/main.js"></script>
+</body>
+
+</html>
