@@ -16,15 +16,6 @@
 
 CSV Movie Explorer is a web application that allows you to import and explore a CSV file. You can filter and search your media as well as view detailed statistics.
 
-## Table of Contents
-
-- [Preview](#preview)
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Project Structure](#project-structure)
-- [License](#license)
-- [Disclaimer](#disclaimer)
-
 ## Preview 
 <details>
 <summary><i>Click to expand</i></summary>
@@ -64,20 +55,6 @@ CSV Movie Explorer is a web application that allows you to import and explore a 
 - **npm** – Package manager for JavaScript, used for managing project dependencies.
 - **Vite** – Build tool and development server for modern web applications, providing fast hot module replacement.
 - **Nix** – (optional) A package manager and build system that allows for reproducible builds and development environments, used with a `shell.nix` file to define project-specific dependencies and environment settings.
-
-## Project Structure
-
-```
-/csv-media-library-explorer/
-├── index.html                 # Main page of the application
-├── assets/
-│   ├── css/
-│   │   └── styles.css         # Custom styles and Tailwind configurations
-│   └── js/
-│       ├── main.js            # Main logic (CSV handling, filters, dark mode, etc.)
-│       └── charts.js          # Initialization and updating of charts
-└── README.md                  # This file
-```
 
 ## License
 
